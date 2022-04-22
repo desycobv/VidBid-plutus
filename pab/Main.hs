@@ -29,6 +29,9 @@ import qualified Plutus.PAB.Webserver.Server         as PAB.Server
 import           Plutus.Contracts.Game               as Game
 import           Plutus.Trace.Emulator.Extract       (writeScriptsTo, ScriptsConfig (..), Command (..))
 import           Ledger.Index                        (ValidatorMode(..))
+import           VidBidMint
+import           VidBid
+import           Plutus.Contract.StateMachine        as SM
 
 main :: IO ()
 main = void $ Simulator.runSimulationWith handlers $ do
@@ -66,6 +69,8 @@ writeCostingScripts = do
 
 data StarterContracts =
     GameContract
+  | VidBidMintContract
+  | VidBidContract
     deriving (Eq, Ord, Show, Generic)
     deriving anyclass OpenApi.ToSchema
 
@@ -90,8 +95,12 @@ instance Builtin.HasDefinitions StarterContracts where
     getDefinitions = [GameContract]
     getSchema =  \case
         GameContract -> Builtin.endpointsToSchemas @Game.GameSchema
+        VidBidMintContract -> Builtin.endpointsToSchemas @VidBidMint.VidBidMintSchema
+        VidBidContract -> Builtin.endpointsToSchemas @VidBid.VidBIdStateMachineSchema
     getContract = \case
         GameContract -> SomeBuiltin (Game.game @ContractError)
+        VidBidMintContract -> SomeBuiltin (VidBidMint.vidBidMintContract @ContractError)
+        VidBidContract -> SomeBuiltin (VidBid.contract @SM.SMContractError)
 
 handlers :: SimulatorEffectHandlers (Builtin StarterContracts)
 handlers =

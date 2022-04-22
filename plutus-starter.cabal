@@ -13,8 +13,8 @@ version:            0.1.0.0
 
 license: Apache-2.0
 license-files: LICENSE
-author:             Your name
-maintainer:         Your email
+author:             Jochen Wilms
+maintainer:         jochen.wilms@desyco.com
 
 -- A copyright notice.
 -- copyright:
@@ -42,6 +42,8 @@ library
     import: lang
     exposed-modules:
       MyModule
+      VidBid
+      VidBidMint
       Plutus.Contracts.Game
     build-depends:
       base >= 4.9 && < 5,
@@ -54,6 +56,8 @@ library
       plutus-tx-plugin,
       plutus-tx,
       plutus-ledger,
+      text,
+      semigroups -any,
     hs-source-dirs: src examples/src
 
 test-suite plutus-example-projects-test
