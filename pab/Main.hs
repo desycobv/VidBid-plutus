@@ -32,27 +32,36 @@ import           Ledger.Index                        (ValidatorMode(..))
 import           VidBidMint
 import           VidBid
 import           Plutus.Contract.StateMachine        as SM
+import           Plutus.PAB.Run (runWith)
+import           Plutus.PAB.Run.PSGenerator (HasPSTypes (..))
+import           Language.PureScript.Bridge (argonaut, equal, genericShow, mkSumType)
 
 main :: IO ()
-main = void $ Simulator.runSimulationWith handlers $ do
-    Simulator.logString @(Builtin StarterContracts) "Starting plutus-starter PAB webserver on port 8080. Press enter to exit."
-    shutdown <- PAB.Server.startServerDebug
-    -- Example of spinning up a game instance on startup
-    -- void $ Simulator.activateContract (Wallet 1) GameContract
-    -- You can add simulator actions here:
-    -- Simulator.observableState
-    -- etc.
-    -- That way, the simulation gets to a predefined state and you don't have to
-    -- use the HTTP API for setup.
+main =  runWith (Builtin.handleBuiltin @StarterContracts)
+--  void $ Simulator.runSimulationWith handlers $ do
+--    Simulator.logString @(Builtin StarterContracts) "Starting plutus-starter PAB webserver on port 8080. Press enter to exit."
+--    shutdown <- PAB.Server.startServerDebug
+--    -- Example of spinning up a game instance on startup
+--    -- void $ Simulator.activateContract (Wallet 1) GameContract
+--    -- You can add simulator actions here:
+--    -- Simulator.observableState
+--    -- etc.
+--    -- That way, the simulation gets to a predefined state and you don't have to
+--    -- use the HTTP API for setup.
+--
+--    -- Pressing enter results in the balances being printed
+--    void $ liftIO getLine
+--
+--    Simulator.logString @(Builtin StarterContracts) "Balances at the end of the simulation"
+--    b <- Simulator.currentBalances
+--    Simulator.logBalances @(Builtin StarterContracts) b
+--
+--    shutdown
 
-    -- Pressing enter results in the balances being printed
-    void $ liftIO getLine
-
-    Simulator.logString @(Builtin StarterContracts) "Balances at the end of the simulation"
-    b <- Simulator.currentBalances
-    Simulator.logBalances @(Builtin StarterContracts) b
-
-    shutdown
+instance HasPSTypes StarterContracts where
+    psTypes =
+        [ equal . genericShow . argonaut $ mkSumType @StarterContracts
+        ]
 
 -- | An example of computing the script size for a particular trace.
 -- Read more: <https://plutus.readthedocs.io/en/latest/plutus/howtos/analysing-scripts.html>
